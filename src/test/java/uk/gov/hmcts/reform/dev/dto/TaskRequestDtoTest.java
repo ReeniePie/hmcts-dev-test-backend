@@ -1,21 +1,20 @@
 package uk.gov.hmcts.reform.dev.dto;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TaskDtoTest {
-
+public class TaskRequestDtoTest
+{
     private static ValidatorFactory factory;
     private static Validator validator;
 
@@ -26,9 +25,9 @@ class TaskDtoTest {
     }
 
     @Test
-    void validateTaskDto_AllFieldsValid_NoViolations() {
+    void validateCreateTaskDto_AllFieldsValid_NoViolations() {
         // Arrange
-        TaskDto taskDto = TaskDto.builder()
+        TaskRequestDto taskRequestDto = TaskRequestDto.builder()
             .title("Valid Title")
             .description("A description under 500 chars")
             .status("OPEN")
@@ -36,7 +35,7 @@ class TaskDtoTest {
             .build();
 
         // Act
-        Set<ConstraintViolation<TaskDto>> violations = validator.validate(taskDto);
+        Set<ConstraintViolation<TaskRequestDto>> violations = validator.validate(taskRequestDto);
 
         // Assert
         assertThat(violations).isEmpty();
@@ -45,7 +44,7 @@ class TaskDtoTest {
     @Test
     void validateTitle_NullTitle_ThrowsNotNullViolation() {
         // Arrange
-        TaskDto taskDto = TaskDto.builder()
+        TaskRequestDto taskRequestDto = TaskRequestDto.builder()
             .title(null)                 // violates @NotNull
             .description("Desc")
             .status("OPEN")
@@ -53,7 +52,7 @@ class TaskDtoTest {
             .build();
 
         // Act
-        Set<ConstraintViolation<TaskDto>> violations = validator.validate(taskDto);
+        Set<ConstraintViolation<TaskRequestDto>> violations = validator.validate(taskRequestDto);
 
         // Assert
         assertThat(violations)
@@ -65,7 +64,7 @@ class TaskDtoTest {
     @Test
     void validateTitle_ShortTitle_ThrowsSizeViolation() {
         // Arrange
-        TaskDto taskDto = TaskDto.builder()
+        TaskRequestDto taskRequestDto = TaskRequestDto.builder()
             .title("Hi")                 // shorter than min=3
             .description("Desc")
             .status("OPEN")
@@ -73,7 +72,7 @@ class TaskDtoTest {
             .build();
 
         // Act
-        Set<ConstraintViolation<TaskDto>> violations = validator.validate(taskDto);
+        Set<ConstraintViolation<TaskRequestDto>> violations = validator.validate(taskRequestDto);
 
         // Assert
         assertThat(violations)
@@ -85,7 +84,7 @@ class TaskDtoTest {
     void validateDescription_LongDescription_ThrowsSizeViolation() {
         // Arrange
         String longDesc = "x".repeat(501); // >500 chars
-        TaskDto taskDto = TaskDto.builder()
+        TaskRequestDto taskRequestDto = TaskRequestDto.builder()
             .title("Valid")
             .description(longDesc)
             .status("OPEN")
@@ -93,7 +92,7 @@ class TaskDtoTest {
             .build();
 
         // Act
-        Set<ConstraintViolation<TaskDto>> violations = validator.validate(taskDto);
+        Set<ConstraintViolation<TaskRequestDto>> violations = validator.validate(taskRequestDto);
 
         // Assert
         assertThat(violations)
@@ -105,7 +104,7 @@ class TaskDtoTest {
     void validateStatus_LongStatus_ThrowsSizeViolation() {
         // Arrange
         String longStatus = "S".repeat(21); // >20 chars
-        TaskDto taskDto = TaskDto.builder()
+        TaskRequestDto taskRequestDto = TaskRequestDto.builder()
             .title("Valid")
             .description("Desc")
             .status(longStatus)
@@ -113,7 +112,7 @@ class TaskDtoTest {
             .build();
 
         // Act
-        Set<ConstraintViolation<TaskDto>> violations = validator.validate(taskDto);
+        Set<ConstraintViolation<TaskRequestDto>> violations = validator.validate(taskRequestDto);
 
         // Assert
         assertThat(violations)
@@ -124,7 +123,7 @@ class TaskDtoTest {
     @Test
     void validateDueDate_PastDate_ThrowsFutureViolation() {
         // Arrange
-        TaskDto taskDto = TaskDto.builder()
+        TaskRequestDto taskRequestDto = TaskRequestDto.builder()
             .title("Valid")
             .description("Desc")
             .status("OPEN")
@@ -132,7 +131,7 @@ class TaskDtoTest {
             .build();
 
         // Act
-        Set<ConstraintViolation<TaskDto>> violations = validator.validate(taskDto);
+        Set<ConstraintViolation<TaskRequestDto>> violations = validator.validate(taskRequestDto);
 
         // Assert
         assertThat(violations)

@@ -4,7 +4,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.reform.dev.dto.TaskDto;
+import uk.gov.hmcts.reform.dev.dto.TaskRequestDto;
+import uk.gov.hmcts.reform.dev.dto.TaskResponseDto;
 import uk.gov.hmcts.reform.dev.services.TaskService;
 
 import java.util.List;
@@ -22,25 +23,25 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskDto> createTask(@Valid @RequestBody TaskDto task) {
-        TaskDto createdTask = taskService.createTask(task);
+    public ResponseEntity<TaskResponseDto> createTask(@Valid @RequestBody TaskRequestDto task) {
+        TaskResponseDto createdTask = taskService.createTask(task);
         return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<TaskDto> getAllTasks() {
+    public List<TaskResponseDto> getAllTasks() {
         return taskService.getAllTasks();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskDto> getTaskById(@PathVariable Long id) {
-        Optional<TaskDto> task = Optional.ofNullable(taskService.getTaskById(id));
+    public ResponseEntity<TaskResponseDto> getTaskById(@PathVariable Long id) {
+        Optional<TaskResponseDto> task = Optional.ofNullable(taskService.getTaskById(id));
         return task.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskDto> updateTask(@PathVariable Long id, @RequestBody TaskDto taskDto) {
-        TaskDto updatedTask = taskService.updateTask(id, taskDto);
+    public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @RequestBody TaskRequestDto taskRequestDto) {
+        TaskResponseDto updatedTask = taskService.updateTask(id, taskRequestDto);
         return ResponseEntity.ok(updatedTask);
     }
 
@@ -50,8 +51,8 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
     @PatchMapping("/{id}/status")
-    public ResponseEntity<TaskDto> updateTaskStatus(@PathVariable Long id, @RequestBody Map<String, String> status) {
-        TaskDto taskDto = taskService.updateTaskStatus(id, status.get("status"));
-        return ResponseEntity.ok(taskDto);
+    public ResponseEntity<TaskResponseDto> updateTaskStatus(@PathVariable Long id, @RequestBody Map<String, String> status) {
+        TaskResponseDto taskResponseDto = taskService.updateTaskStatus(id, status.get("status"));
+        return ResponseEntity.ok(taskResponseDto);
     }
 }

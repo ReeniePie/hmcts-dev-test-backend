@@ -6,7 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.dev.dto.TaskDto;
+import uk.gov.hmcts.reform.dev.dto.TaskRequestDto;
+import uk.gov.hmcts.reform.dev.dto.TaskResponseDto;
 import uk.gov.hmcts.reform.dev.exception.ResourceNotFoundException;
 import uk.gov.hmcts.reform.dev.models.Task;
 import uk.gov.hmcts.reform.dev.repositories.TaskRepository;
@@ -26,12 +27,13 @@ class TaskServiceTest {
     @InjectMocks
     private TaskService taskService;
 
-    private TaskDto taskDto;
+    private TaskResponseDto taskResponseDto;
+    private TaskRequestDto taskRequestDto;
     private Task task;
 
     @BeforeEach
     void setUp() {
-        taskDto = TaskDto.builder()
+        taskResponseDto = TaskResponseDto.builder()
             .title("Test Task")
             .description("Test Description")
             .status("OPEN")
@@ -46,6 +48,12 @@ class TaskServiceTest {
             LocalDateTime.now(),
             LocalDateTime.now().plusDays(1)
         );
+        taskRequestDto = TaskRequestDto.builder()
+            .title("Test Task")
+            .description("Test Description")
+            .status("OPEN")
+            .dueDate(LocalDateTime.now().plusDays(1))
+            .build();
 
     }
 
@@ -60,10 +68,10 @@ class TaskServiceTest {
             });
 
         // Act
-        TaskDto result = taskService.createTask(taskDto);
+        TaskResponseDto result = taskService.createTask(taskRequestDto);
 
         // Assert
-        assertThat(result.getTitle()).isEqualTo(taskDto.getTitle());
+        assertThat(result.getTitle()).isEqualTo(taskRequestDto.getTitle());
         verify(taskRepository).save(any(Task.class));
     }
 
@@ -74,7 +82,7 @@ class TaskServiceTest {
             .thenReturn(List.of(task));
 
         // Act
-        List<TaskDto> result = taskService.getAllTasks();
+        List<TaskResponseDto> result = taskService.getAllTasks();
 
         // Assert
         assertThat(result).hasSize(1);
@@ -87,7 +95,7 @@ class TaskServiceTest {
         when(taskRepository.findById(1L))
             .thenReturn(Optional.of(task));
 
-        TaskDto result = taskService.getTaskById(1L);
+        TaskResponseDto result = taskService.getTaskById(1L);
 
         assertThat(result.getTitle()).isEqualTo(task.getTitle());
         verify(taskRepository).findById(1L);
@@ -111,9 +119,9 @@ class TaskServiceTest {
         when(taskRepository.save(any(Task.class)))
             .thenReturn(task);
 
-        TaskDto result = taskService.updateTask(1L, taskDto);
+        TaskResponseDto result = taskService.updateTask(1L, taskRequestDto);
 
-        assertThat(result.getStatus()).isEqualTo(taskDto.getStatus());
+        assertThat(result.getStatus()).isEqualTo(taskResponseDto.getStatus());
         verify(taskRepository).findById(1L);
         verify(taskRepository).save(any(Task.class));
     }
@@ -123,7 +131,7 @@ class TaskServiceTest {
         when(taskRepository.findById(2L))
             .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> taskService.updateTask(2L, taskDto))
+        assertThatThrownBy(() -> taskService.updateTask(2L, taskRequestDto))
             .isInstanceOf(ResourceNotFoundException.class);
         verify(taskRepository).findById(2L);
     }
@@ -135,7 +143,7 @@ class TaskServiceTest {
         when(taskRepository.save(any(Task.class)))
             .thenReturn(task);
 
-        TaskDto result = taskService.updateTaskStatus(1L, "COMPLETED");
+        TaskResponseDto result = taskService.updateTaskStatus(1L, "COMPLETED");
 
         assertThat(result.getStatus()).isEqualTo("COMPLETED");
         verify(taskRepository).findById(1L);

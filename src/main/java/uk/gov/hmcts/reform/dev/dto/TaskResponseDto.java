@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.dev.dto;
 
 import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -15,7 +14,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TaskDto {
+public class TaskResponseDto {
+
+    @NotNull(message = "ID must not be null")
+    private Long id;
     @NotNull(message = "Title must not be null")
     @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
     private String title;
@@ -29,3 +31,4 @@ public class TaskDto {
     @Future(message = "Due date must be in the future")
     private LocalDateTime dueDate;
 }
+
